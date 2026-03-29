@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-travel-windows
+      author: fluxnova
+      changes:
+        - createTable:
+            tableName: travel_windows
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: year
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: season
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: available_days
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notes
+                  type: VARCHAR(500)

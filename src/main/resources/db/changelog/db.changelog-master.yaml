@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-destinations.yaml
+  - include:
+      file: db/changelog/changes/002-create-travel-windows.yaml
+  - include:
+      file: db/changelog/changes/003-create-trips.yaml

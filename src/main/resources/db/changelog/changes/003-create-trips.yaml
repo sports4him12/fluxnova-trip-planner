@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-trips
+      author: fluxnova
+      changes:
+        - createTable:
+            tableName: trips
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: destination_id
+                  type: BIGINT
+              - column:
+                  name: travel_window_id
+                  type: BIGINT
+              - column:
+                  name: start_date
+                  type: DATE
+              - column:
+                  name: end_date
+                  type: DATE
+              - column:
+                  name: season
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                  defaultValue: DRAFT
+              - column:
+                  name: notes
+                  type: VARCHAR(1000)
+              - column:
+                  name: workflow_instance_id
+                  type: VARCHAR(255)
+              - column:
+                  name: current_task_key
+                  type: VARCHAR(255)
+        - addForeignKeyConstraint:
+            baseTableName: trips
+            baseColumnNames: destination_id
+            referencedTableName: destinations
+            referencedColumnNames: id
+            constraintName: fk_trips_destination
+            onDelete: SET NULL
+        - addForeignKeyConstraint:
+            baseTableName: trips
+            baseColumnNames: travel_window_id
+            referencedTableName: travel_windows
+            referencedColumnNames: id
+            constraintName: fk_trips_travel_window
+            onDelete: SET NULL
