@@ -37,6 +37,19 @@ class AiControllerTest {
     }
 
     @Test
+    void chat_withTripId_usesTripScopedMemory() throws Exception {
+        when(assistant.chat(eq("trip-42"), any())).thenReturn("Planning your trip...");
+
+        mockMvc.perform(post("/api/ai/chat")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("message", "Let's plan!", "tripId", "42"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response").value("Planning your trip..."));
+
+        verify(assistant).chat(eq("trip-42"), any());
+    }
+
+    @Test
     void chat_missingMessage_returns400() throws Exception {
         mockMvc.perform(post("/api/ai/chat")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -183,6 +183,63 @@ class WorkflowServiceTest {
                 .hasMessageContaining("No workflow");
     }
 
+    // ── syncStatus ──────────────────────────────────────────────────────────
+
+    @Test
+    void syncStatus_noWorkflowId_doesNothing() {
+        Trip trip = tripWith(1L, "Test");
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+        workflowService.syncStatus(1L);
+        verifyNoInteractions(fluxNovaClient);
+        verify(tripRepository, never()).save(any());
+    }
+
+    @Test
+    void syncStatus_noActiveTasks_doesNothing() {
+        Trip trip = tripWith(1L, "Test");
+        trip.setWorkflowInstanceId("inst-abc");
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+        when(fluxNovaClient.getTasksForInstance("inst-abc")).thenReturn(List.of());
+        workflowService.syncStatus(1L);
+        verify(tripRepository, never()).save(any());
+    }
+
+    @Test
+    void syncStatus_gatherTask_keepsPlanningStatus() {
+        Trip trip = tripWith(1L, "Test");
+        trip.setWorkflowInstanceId("inst-abc");
+        trip.setStatus(TripStatus.PLANNING);
+        TaskResponse task = new TaskResponse();
+        task.setTaskDefinitionKey("gather-trip-details");
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+        when(fluxNovaClient.getTasksForInstance("inst-abc")).thenReturn(List.of(task));
+        workflowService.syncStatus(1L);
+        // Status unchanged — no save needed
+        verify(tripRepository, never()).save(any());
+    }
+
+    @Test
+    void syncStatus_generateOutlineTask_setsApproved() {
+        Trip trip = tripWith(1L, "Test");
+        trip.setWorkflowInstanceId("inst-abc");
+        trip.setStatus(TripStatus.PLANNING);
+        TaskResponse task = new TaskResponse();
+        task.setTaskDefinitionKey("generate-trip-outline");
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+        when(fluxNovaClient.getTasksForInstance("inst-abc")).thenReturn(List.of(task));
+        when(tripRepository.save(trip)).thenReturn(trip);
+        workflowService.syncStatus(1L);
+        assertThat(trip.getStatus()).isEqualTo(TripStatus.APPROVED);
+        verify(tripRepository).save(trip);
+    }
+
+    @Test
+    void syncStatus_tripNotFound_throws() {
+        when(tripRepository.findById(9L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> workflowService.syncStatus(9L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     // ── helpers ─────────────────────────────────────────────────────────────
 
     private Trip tripWith(Long id, String title) {
