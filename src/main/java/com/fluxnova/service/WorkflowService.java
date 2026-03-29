@@ -64,10 +64,36 @@ public class WorkflowService {
 
         fluxNovaClient.completeTask(taskId, variables);
 
-        // Refresh and sync status from the workflow instance
+        // Sync trip status with the workflow state after task completion
         ProcessInstanceResponse instance = fluxNovaClient.getProcessInstance(trip.getWorkflowInstanceId());
-        if ("COMPLETED".equalsIgnoreCase(instance.getState())) {
-            trip.setStatus(TripStatus.APPROVED);
+        if (instance.isEnded()) {
+            trip.setStatus(TripStatus.BOOKED);
+            tripRepository.save(trip);
+        }
+    }
+
+    /** Sync the trip's local status to match the active task in the workflow. */
+    @Transactional
+    public void syncStatus(Long tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("Trip not found: " + tripId));
+
+        if (trip.getWorkflowInstanceId() == null) return;
+
+        List<TaskResponse> tasks = fluxNovaClient.getTasksForInstance(trip.getWorkflowInstanceId());
+        if (tasks.isEmpty()) return;
+
+        String taskKey = tasks.get(0).getTaskDefinitionKey();
+        TripStatus newStatus = switch (taskKey) {
+            case "gather-trip-details"  -> TripStatus.PLANNING;
+            case "review-and-confirm"   -> TripStatus.PLANNING;
+            case "generate-trip-outline"-> TripStatus.APPROVED;
+            case "book-with-expedia"    -> TripStatus.APPROVED;
+            default -> trip.getStatus();
+        };
+
+        if (newStatus != trip.getStatus()) {
+            trip.setStatus(newStatus);
             tripRepository.save(trip);
         }
     }
