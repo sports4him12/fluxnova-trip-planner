@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -26,7 +27,7 @@ class AiControllerTest {
 
     @Test
     void chat_validMessage_returnsResponse() throws Exception {
-        when(assistant.chat("What trips are available?")).thenReturn("Here are your trips...");
+        when(assistant.chat(any(), any())).thenReturn("Here are your trips...");
 
         mockMvc.perform(post("/api/ai/chat")
                         .contentType(MediaType.APPLICATION_JSON)
