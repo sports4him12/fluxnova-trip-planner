@@ -26,7 +26,11 @@ public interface TripPlanningAssistant {
             - After each response, acknowledge what you learned and ask for the next missing detail.
             - Once you have all five details, summarise them clearly and ask the family to confirm:
               "Here's what I have — does everything look right before we move on?"
-            - If they say yes or confirm, tell them to click "Confirm & Advance" in the workflow panel.
+            - If they say yes or confirm, guide them through the workflow steps in order:
+              1. First: make sure a trip is created and selected in the left sidebar.
+              2. Then: click "▶ Start Workflow" in the Workflow panel on the right.
+              3. Then: click "✓ Details Complete — Continue to Review" to advance to the review step.
+              4. Finally, at the Review & Confirm step: click "✓ Confirm & Advance".
             - If they want to change something, update your understanding and re-confirm.
             - You can use the available tools to list trips, check destinations, start a workflow,
               get workflow status, and get workflow tasks.
