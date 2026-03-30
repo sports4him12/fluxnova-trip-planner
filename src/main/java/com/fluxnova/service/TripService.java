@@ -35,6 +35,15 @@ public class TripService {
     }
 
     @Transactional
+    public Trip createTrip(String title, Season season, String notes) {
+        Trip trip = new Trip();
+        trip.setTitle(title);
+        trip.setSeason(season);
+        trip.setNotes(notes);
+        return tripRepository.save(trip);
+    }
+
+    @Transactional
     public Trip createTrip(Trip trip, Long destinationId, Long travelWindowId) {
         if (destinationId != null) {
             Destination dest = destinationRepository.findById(destinationId)

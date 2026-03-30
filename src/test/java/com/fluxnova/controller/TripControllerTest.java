@@ -61,7 +61,7 @@ class TripControllerTest {
     void createTrip_returns201() throws Exception {
         Trip input = trip(null, "New Trip");
         Trip saved = trip(1L, "New Trip");
-        when(tripService.createTrip(any(), isNull(), isNull())).thenReturn(saved);
+        when(tripService.createTrip(any(Trip.class), isNull(), isNull())).thenReturn(saved);
 
         mockMvc.perform(post("/api/trips")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +73,7 @@ class TripControllerTest {
     @Test
     void createTrip_withDestinationId_passesIdToService() throws Exception {
         Trip saved = trip(1L, "New Trip");
-        when(tripService.createTrip(any(), eq(5L), isNull())).thenReturn(saved);
+        when(tripService.createTrip(any(Trip.class), eq(5L), isNull())).thenReturn(saved);
 
         mockMvc.perform(post("/api/trips")
                         .param("destinationId", "5")

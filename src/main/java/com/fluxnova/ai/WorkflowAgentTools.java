@@ -23,6 +23,12 @@ public class WorkflowAgentTools {
     private final TripService tripService;
     private final WorkflowService workflowService;
 
+    @Tool("Create a new trip with a title, season (SPRING, SUMMER, FALL, or WINTER), and optional notes summarising preferences (location, duration, group size, etc.)")
+    public String createTrip(String title, String season, String notes) {
+        Trip trip = tripService.createTrip(title, Season.valueOf(season.toUpperCase()), notes);
+        return String.format("Trip created: id=%d, title=%s, season=%s", trip.getId(), trip.getTitle(), trip.getSeason());
+    }
+
     @Tool("List all planned trips, optionally filtered by season (SPRING, SUMMER, FALL, WINTER)")
     public String listTrips(String season) {
         List<Trip> trips = season != null && !season.isBlank()
