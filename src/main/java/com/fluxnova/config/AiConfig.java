@@ -1,5 +1,7 @@
 package com.fluxnova.config;
 
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,12 +10,20 @@ import org.springframework.context.annotation.Configuration;
 public class AiConfig {
 
     /**
-     * Shared store keyed by conversation ID (e.g. "trip-1").
-     * LangChain4J's @AiService wires this in automatically when @MemoryId is declared
-     * on the service method, giving each trip its own persistent message history.
+     * Provides per-conversation chat memory keyed by the @MemoryId value.
+     *
+     * AiServicesAutoConfig looks for ChatMemoryProvider beans (not ChatMemoryStore).
+     * A single InMemoryChatMemoryStore is shared across all conversations so that
+     * message history is preserved between requests for the same conversation ID.
+     * maxMessages=20 gives plenty of room for a full trip-planning dialogue.
      */
     @Bean
-    public InMemoryChatMemoryStore chatMemoryStore() {
-        return new InMemoryChatMemoryStore();
+    public ChatMemoryProvider chatMemoryProvider() {
+        InMemoryChatMemoryStore store = new InMemoryChatMemoryStore();
+        return memoryId -> MessageWindowChatMemory.builder()
+                .id(memoryId)
+                .maxMessages(20)
+                .chatMemoryStore(store)
+                .build();
     }
 }
