@@ -85,6 +85,21 @@ public class FluxNovaClient {
     }
 
     /**
+     * Fetch the deployed BPMN XML for a process definition key.
+     * GET /process-definition/key/{key}/xml
+     * Returns the raw BPMN 2.0 XML string.
+     */
+    public String getProcessDefinitionXml(String processDefinitionKey) {
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, Object> result = webClient.get()
+                .uri("/process-definition/key/{key}/xml", processDefinitionKey)
+                .retrieve()
+                .bodyToMono(java.util.Map.class)
+                .block();
+        return result != null ? (String) result.get("bpmn20Xml") : null;
+    }
+
+    /**
      * Delete (cancel) a running process instance.
      * DELETE /process-instance/{id}
      */
