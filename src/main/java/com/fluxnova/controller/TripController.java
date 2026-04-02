@@ -4,10 +4,13 @@ import com.fluxnova.model.Destination;
 import com.fluxnova.model.Season;
 import com.fluxnova.model.TravelWindow;
 import com.fluxnova.model.Trip;
+import com.fluxnova.service.TripPdfService;
 import com.fluxnova.service.TripService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,8 @@ import java.util.List;
 @RequestMapping("/api/trips")
 @RequiredArgsConstructor
 public class TripController {
+
+    private final TripPdfService tripPdfService;
 
     private final TripService tripService;
 
@@ -76,5 +81,16 @@ public class TripController {
     @PostMapping("/travel-windows")
     public ResponseEntity<TravelWindow> createTravelWindow(@Valid @RequestBody TravelWindow window) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tripService.saveTravelWindow(window));
+    }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
+        Trip trip = tripService.getTripById(id);
+        byte[] pdf = tripPdfService.generate(trip);
+        String filename = trip.getTitle().replaceAll("[^a-zA-Z0-9\\-_ ]", "").trim().replace(' ', '_') + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(pdf);
     }
 }

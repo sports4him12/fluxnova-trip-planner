@@ -5,6 +5,7 @@ import com.fluxnova.model.Destination;
 import com.fluxnova.model.Season;
 import com.fluxnova.model.TravelWindow;
 import com.fluxnova.model.Trip;
+import com.fluxnova.service.TripPdfService;
 import com.fluxnova.service.TripService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ class TripControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
     @MockitoBean TripService tripService;
+    @MockitoBean TripPdfService tripPdfService;
 
     // ── GET /api/trips ──────────────────────────────────────────────────────
 

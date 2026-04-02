@@ -111,6 +111,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- PDF generation -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
         <!-- H2 for slice tests (replaces MySQL in test scope) -->
         <dependency>
             <groupId>com.h2database</groupId>

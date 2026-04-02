@@ -224,7 +224,7 @@ class WorkflowServiceTest {
         trip.setWorkflowInstanceId("inst-abc");
         trip.setStatus(TripStatus.PLANNING);
         TaskResponse task = new TaskResponse();
-        task.setTaskDefinitionKey("generate-trip-outline");
+        task.setTaskDefinitionKey("generate-trip-pdf");
         when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
         when(fluxNovaClient.getTasksForInstance("inst-abc")).thenReturn(List.of(task));
         when(tripRepository.save(trip)).thenReturn(trip);

@@ -85,10 +85,9 @@ public class WorkflowService {
 
         String taskKey = tasks.get(0).getTaskDefinitionKey();
         TripStatus newStatus = switch (taskKey) {
-            case "gather-trip-details"  -> TripStatus.PLANNING;
-            case "review-and-confirm"   -> TripStatus.PLANNING;
-            case "generate-trip-outline"-> TripStatus.APPROVED;
-            case "book-with-expedia"    -> TripStatus.APPROVED;
+            case "gather-trip-details" -> TripStatus.PLANNING;
+            case "review-and-confirm"  -> TripStatus.PLANNING;
+            case "generate-trip-pdf"   -> TripStatus.APPROVED;
             default -> trip.getStatus();
         };
 
