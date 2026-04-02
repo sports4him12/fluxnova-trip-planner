@@ -64,9 +64,16 @@ public class WorkflowService {
 
         fluxNovaClient.completeTask(taskId, variables);
 
-        // Sync trip status with the workflow state after task completion
-        ProcessInstanceResponse instance = fluxNovaClient.getProcessInstance(trip.getWorkflowInstanceId());
-        if (instance.isEnded()) {
+        // After completing the last task the process instance is deleted by Camunda,
+        // so getProcessInstance returns 404. Treat that as "ended".
+        try {
+            ProcessInstanceResponse instance = fluxNovaClient.getProcessInstance(trip.getWorkflowInstanceId());
+            if (instance.isEnded()) {
+                trip.setStatus(TripStatus.BOOKED);
+                tripRepository.save(trip);
+            }
+        } catch (Exception e) {
+            // 404 = process ended and was cleaned up — mark trip as BOOKED
             trip.setStatus(TripStatus.BOOKED);
             tripRepository.save(trip);
         }
